@@ -1,0 +1,90 @@
+name: "Build EKS"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  Terraform:
+    name: "Build EKS Cluster"
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    defaults:
+      run:
+        working-directory: eks-core
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
+
+      - name: Update kubeconfig
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name eks-service
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4.1.0
+        with:
+          version: 'latest'
+
+      - name: Add EKS Helm repository
+        run: |
+          helm repo add stable https://charts.helm.sh/stable
+
+      - name: Helm version
+        run: |
+          helm version
+
+      - name: Helm repo update
+        run: |
+          helm repo update
+
+      - name: Helm repo add eks
+        run: |
+          helm repo add eks https://aws.github.io/eks-charts
+          helm repo update eks
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.8.4
+          terraform_wrapper: false
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var-file="../eks-core-vars/variables.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply tfplan
+        
