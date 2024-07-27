@@ -52,9 +52,9 @@ self_managed_node_groups = {
     launch_template_name         = "self-managed-eks-core-36"
     launch_template_use_name_prefix = false
     instance_type                = "m5.large"
-    min_size                     = 1
-    max_size                     = 2
-    desired_size                 = 1
+    min_size                     = 2
+    max_size                     = 3
+    desired_size                 = 2
     labels    = {
       Which = "fargate"
     }
