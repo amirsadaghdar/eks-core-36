@@ -19,8 +19,8 @@ eks_managed_node_groups = {
     use_custom_launch_template = false
     instance_types             = ["m5.large"]
     min_size                   = 1
-    max_size                   = 2
-    desired_size               = 1
+    max_size                   = 3
+    desired_size               = 2
     labels                     = {
       Which = "managed"
     }
