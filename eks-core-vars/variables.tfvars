@@ -18,9 +18,9 @@ eks_managed_node_groups = {
     iam_role_use_name_prefix   = false
     use_custom_launch_template = false
     instance_types             = ["m5.large"]
-    min_size                   = 2
+    min_size                   = 1
     max_size                   = 3
-    desired_size               = 2
+    desired_size               = 1
     labels                     = {
       Which = "managed"
     }
@@ -52,9 +52,9 @@ self_managed_node_groups = {
     launch_template_name         = "self-managed-eks-core-36"
     launch_template_use_name_prefix = false
     instance_type                = "m5.large"
-    min_size                     = 2
+    min_size                     = 1
     max_size                     = 3
-    desired_size                 = 2
+    desired_size                 = 1
     labels    = {
       Which = "fargate"
     }
